@@ -1,0 +1,44 @@
+server:
+  port: 8080
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://discovery-server:8762/eureka/
+    fetch-registry: true
+    register-with-eureka: true
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${server.port}
+
+spring:
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+          filters: []
+      routes:
+        - id: auth-service
+          uri: lb://auth-service
+          predicates:
+            - Path=/auth-service/api/**
+        - id: employee-service
+          uri: lb://employee-service
+          predicates:
+            - Path=/employee-service/api/**
+        - id: attendance-service
+          uri: lb://attendance-service
+          predicates:
+            - Path=/api/attendance/**
+        - id: payroll-service
+          uri: lb://payroll-service
+          predicates:
+            - Path=/api/payroll/**
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway
